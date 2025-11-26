@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Let browser know website is optimized for mobile-->
+
+    <title>Tirailleur-senegalais</title>
+
+    <link rel='stylesheet' href='/css/style.css'>
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css' />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><!--Import Google Icon Font-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <!--Import materialize.css-->
+
+
+    <script src='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.js'></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script type='text/javascript' src='page2.js'></script>
+
+    <!-- import de materializecss / google icon et materialize JS/ -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</head>
+
+<body>
+    <div class="papier">
+        <nav class="nav-extended">
+            <div class="nav-wrapper">
+                <a href="index.html" class="brand-logo">LOGO</a>
+            </div>
+            <div class="nav-content">
+                <ul class="tabs tabs-transparent scrollable">
+                    <li class="tab"><a href="index.html">Page d'acceuil</a></li>
+                    <li class="tab"><a class="active" href="page1.html">1ere guerre mondiale</a></li>
+                    <li class="tab"><a href="page2.html">2eme guerre mondiale</a></li>
+                </ul>
+            </div>
+        </nav>
+
+
+        <div class="section">
+            <h3> La première guerre :</h3>
+            <p>Après avoir établi la portée et l'ampleur de la mobilisation des tirailleurs sénégalais,
+                 venus de multiples horizons, notre étude se concentrera désormais sur l'humain.
+                  Nous allons retracer, pour chaque conflit, le parcours singulier d'un soldat ayant pris part aux combats.<br>
+                  Pour illustrer la Seconde Guerre mondiale, nous mettrons en lumière le destin d'Addi Bâ. Ce célèbre combattant, 
+                  originaire de Guinée française, fut fusillé à Épinal en 1943. 
+                  Son sacrifice pour la France en fait une figure emblématique de la Résistance.</p>
+            <div class="sectionclass">
+                <!-- Colonne gauche (75%) -->
+                <div class="column-1">
+                    <p>c'est une colonne de gauche</p>
+                    <div id="mapid"></div><br>
+                </div>
+                <!-- Colonne droite (25%) -->
+                <div class="column-2">
+                    <p>c'est une colonne de droite</p><br>
+                </div>
+            </div>
+        </div> 
+    </div>
+
+</body>
