@@ -140,21 +140,3 @@ p {
     margin-right: 8px;
     opacity: 0.7;
 }
-
-/* Style pour les graphs */
-.tooltip {
-    position: absolute;
-    text-align: center;
-    padding: 8px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    border-radius: 4px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-#mongraphique1,
-#button1 {
-    display: none;
-}
