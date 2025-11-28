@@ -117,7 +117,6 @@ p {
 /*Création de la Carte*/
 #mapid {
     flex-grow: 1;
-    height: 100%;
     min-height: 450px;
     width: 100%;
     border-radius: 5px;
