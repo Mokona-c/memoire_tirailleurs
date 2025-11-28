@@ -2,8 +2,8 @@ const infoBox = document.getElementById('info-box');
     const map = new maplibregl.Map({
         container: 'mapid',
         style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
-        center: [12.0, 1.0],
-        zoom: 7
+        center: [12.0, -1.5],
+        zoom: 4
     });
     let hoveredStateId = null;
 
