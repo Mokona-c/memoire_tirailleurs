@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>La vie de Bourama Diémé</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.js'></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body, #map { height: 100%; }
+    </style>
+</head>
+<body>
+<style>
+    #map {
+        position: fixed;
+        width: 50%;
+    }
+    #features {
+        width: 50%;
+        margin-left: 50%;
+        font-family: sans-serif;
+        overflow-y: scroll;
+        background-color: #fafafa;
+    }
+    section {
+        padding: 25px 50px;
+        line-height: 25px;
+        border-bottom: 1px solid #ddd;
+        opacity: 0.25;
+        font-size: 13px;
+    }
+    section.active {
+        opacity: 1;
+    }
+    section:last-child {
+        border-bottom: none;
+        margin-bottom: 200px;
+    }
+</style>
+
+<div id="map"></div>
+<div id="features">
+    <section id="naissance" class="active">
+        <h3>1919 : naissance</h3>
+        <p>Bourama Diémé naît le 1er janvier 1919 à Marsassoum, en Casamance au Sénégal.</p>
+        <p></p>
+    </section>
+    <section id="1939">
+        <h3>5 janvier 1939 : appel au combat</h3>
+        <p>D'abord appelé au 7ème Régiment de Tirailleurs Sénégalais (RTS), il fût ensuite transféré au 16ème RTS à Cahors, dans le Lot.</p>
+    </section>
+    <section id="combats">
+        <h3>Mai 1940 : les combats de la bataille de France</h3>
+        <p>D'abord stationné en Alsace-Lorraine lors de la "drôle de guerre", il combattit dans la Sarre, la Somme puis à Villers-Bretonneux.</p>
+    </section>
+    <section id="stalag">
+        <h3>1940 : capture et emprisonnement</h3>
+        <p>Capturé par les Allemands, il échappe à l'éxécution avant d'être emprisonné près de Berlin, au Stalag 10B.</p>
+    </section>
+    <section id="transfert">
+        <h3>1941 : transfert au camp de Buglose</h3>
+        <p>Il fût ensuite transféré en zone occupée, au camp de Buglose dans les Landes, où sont emprisonnés les troupes coloniales françaises.</p>
+    </section>
+    <section id="evasion">
+        <h3>1942 : l'évasion</h3>
+        <p>En mars 1942, il parvient à séchapper du camp de Buglose, et gagne la zone libre. A partir de là, il gagne Dakar au Sénégal pour rejoindre les rangs de la France Libre. Il est ensuite reversé au 17ème RT en 1943, avant d'être transféré au 16ème RTS en 1944, alors déployé au Maroc.</p>
+    </section>
+    <section id="debarquement">
+        <h3>1944-1945 : débarquement à Toulon puis campagne de France</h3>
+        <p>Il participa ensuite au débarquement de Provence en septembre 1944. D'abord débarqué à Toulon, il participa ensuite à la Libération de la France jusque la fin de la guerre.</p>
+    </section>
+    <section id="indochine">
+        <h3>1949-1951 puis 1953-1955 : guerre d'Indochine</h3>
+        <p>D'abord promu caporal-chef lors de déploiements en Afrique du Nord après la guerre, il servit ensuite en Indochine au sein du 29ème Bataillon de Marche de Tirailleurs Sénégalais. Il s'illustra notamment au cours de la bataille de Vinh-Yen en 1950, où il est promu sergent.</p>
+    </section>
+    <section id="suez">
+        <h3>1956 : expédition de Suez</h3>
+        <p>A son retour d'Indochine, il fût transféré au 23ème Régiment d'Infanterie Coloniale avant d'être envoyé en Egypte pour participer à l'expédition de Suez.</p>
+    </section>
+    <section id="algerie">
+        <h3>1956-1959 : guerre d'Algérie</h3>
+        <p>Une fois revenu de Suez, son unité est envoyée en Algérie. Il s'illustra notamment en 1958 dans l'oued Cheurfa, où il détruisit une importante position du F.L.N.
+        Il est ensuite libéré de ses obligations militaires françaises, avant de rejoindre l'armée sénégalaise, où il s'illustra notamment au Congo belge. Il quitta ses fonctions militaires en 1965.</p>
+    </section>
+    <section id="fin">
+        <h3>Après l'Armée</h3>
+        <p>Après sa retraite en 1965, il resta au Sénégal jusqu'en 1989, pour s'installer à Sarcelles. En 1991, il fût nommé Commandeur de la Légion d'Honneur, puit obtînt la nationalité française en 1996. Il meurt le 6 juin 1999.</p>
+        <small id="citation">
+            Adapted from
+            <a href="https://www.memoiredeshommes.defense.gouv.fr/fichier/1054/13826647"
+                >Fiche Biographique</a
+            >
+        </small>
+    </section>
+</div>
+<script>
+    const map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+        center: [-15.97, 12.82],
+        zoom: 10
+    });
+
+    const chapters = {
+        'naissance': {
+            center: [-15.97, 12.82],
+            zoom: 10
+        },
+        '1939': {
+            center: [1.43, 44.43],
+            zoom: 10
+        },
+        'combats': {
+            center: [2.52, 49.87],
+            zoom: 10
+        },
+        'stalag': {
+            center: [13.4, 52.62],
+            zoom: 10
+        },
+        'transfert': {
+            center: [-0.98, 43.73],
+            zoom: 10
+        },
+        'evasion': {
+            center: [-17.45, 14.72],
+            zoom: 10
+        },
+        'debarquement': {
+            center: [5.92, 43.12],
+            zoom: 10
+        },
+        'indochine': {
+            center: [105.58, 21.3],
+            zoom: 10
+        },
+        'suez': {
+            center: [32.55, 29.97],
+            zoom: 10
+        },
+        'algerie': {
+            center: [2.51, 36.2],
+            zoom: 10
+        },
+        'fin': {
+            center: [2.36, 48.98],
+            zoom: 10
+        }
+    };
+    const m_naissance = new maplibregl.Marker()
+        .setLngLat([-15.97, 12.82])
+        .addTo(map);
+    const m_1939 = new maplibregl.Marker()
+        .setLngLat([1.43,44.43])
+        .addTo(map);
+    const m_combats = new maplibregl.Marker()
+        .setLngLat([2.52,49.87])
+        .addTo(map);
+    const m_stalag = new maplibregl.Marker()
+        .setLngLat([13.4, 52.62])
+        .addTo(map);
+    const m_transfert = new maplibregl.Marker()
+        .setLngLat([-0.98, 43.73])
+        .addTo(map);
+    const m_evasion = new maplibregl.Marker()
+        .setLngLat([-17.45, 14.72])
+        .addTo(map);
+    const m_debarquement = new maplibregl.Marker()
+        .setLngLat([5.92, 43.12])
+        .addTo(map);
+    const m_indochine = new maplibregl.Marker()
+        .setLngLat([105.58, 21.3])
+        .addTo(map);
+    const m_suez = new maplibregl.Marker()
+        .setLngLat([32.55, 29.97])
+        .addTo(map);
+    const m_algerie = new maplibregl.Marker()
+        .setLngLat([2.51, 36.2])
+        .addTo(map);
+    const m_fin = new maplibregl.Marker()
+        .setLngLat([2.36, 48.98])
+        .addTo(map);
+
+    // On every scroll event, check which element is on screen
+    window.onscroll = function () {
+        const chapterNames = Object.keys(chapters);
+        for (let i = 0; i < chapterNames.length; i++) {
+            const chapterName = chapterNames[i];
+            if (isElementOnScreen(chapterName)) {
+                setActiveChapter(chapterName);
+                break;
+            }
+        }
+    };
+
+    let activeChapterName = 'naissance';
+    function setActiveChapter(chapterName) {
+        if (chapterName === activeChapterName) return;
+
+        map.flyTo(chapters[chapterName]);
+
+        document.getElementById(chapterName).setAttribute('class', 'active');
+        document.getElementById(activeChapterName).setAttribute('class', '');
+
+        activeChapterName = chapterName;
+    }
+
+    function isElementOnScreen(id) {
+        const element = document.getElementById(id);
+        const bounds = element.getBoundingClientRect();
+        return bounds.top < window.innerHeight && bounds.bottom > 0;
+    }
+</script>
+</body>
+</html>
