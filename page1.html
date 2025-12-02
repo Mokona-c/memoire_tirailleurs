@@ -21,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="assets/js/main.js"></script>
 
     <!-- import de materializecss / google icon et materialize JS/ -->
@@ -32,22 +33,21 @@
 
 <body>
     <div class="papier">
-        <nav class="nav-extended">
+         <nav class="nav-extended">
             <div class="nav-wrapper">
                 <a href="index.html" class="brand-logo">LOGO</a>
             </div>
             <div class="nav-content">
                 <ul class="tabs tabs-transparent scrollable">
                     <li class="tab"><a href="index.html">Page d'acceuil</a></li>
-                    <li class="tab"><a class="active" href="page1.html">1ere guerre mondiale</a></li>
-                    <li class="tab"><a href="page2.html">2eme guerre mondiale</a></li>
+                    <li class="tab"><a class="active" href="page1.html">Les 2 guerres</a></li>
+                    <li class="tab"><a href="page2.html">Les soldats</a></li>
                 </ul>
             </div>
         </nav>
-
     
         <div class="section">
-            <h2> 1GM </h2>
+            <h1> 1GM </h1>
             <p>page 1</p>
 
             <div class="sectionclass">
@@ -60,7 +60,9 @@
                 </div>
                 <!-- Colonne droite (25%) -->
                 <div class="column-2">
-                    <p>c'est une colonne de droite</p><br>
+                    <div id="info-box">Survolez une entité...</div>
+                    <p>Faire un pie chart des recrutement </p><br>
+                    <canvas id="pieChart"></canvas>
                 </div>
                 <!-- graphique-->
             </div>
