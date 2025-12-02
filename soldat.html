@@ -88,7 +88,7 @@
         <h3>Après l'Armée</h3>
         <p>Après sa retraite en 1965, il resta au Sénégal jusqu'en 1989, pour s'installer à Sarcelles. En 1991, il fût nommé Commandeur de la Légion d'Honneur, puit obtînt la nationalité française en 1996. Il meurt le 6 juin 1999.</p>
         <small id="citation">
-            Adapted from
+            Consultez la 
             <a href="https://www.memoiredeshommes.defense.gouv.fr/fichier/1054/13826647"
                 >Fiche Biographique</a
             >
@@ -103,6 +103,12 @@
         zoom: 10
     });
 
+    map.on('style.load', () => {
+        map.setProjection({
+            type: 'globe', // Set projection to globe
+        });
+    });
+    
     const chapters = {
         'naissance': {
             center: [-15.97, 12.82],
