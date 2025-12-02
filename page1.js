@@ -29,6 +29,30 @@ const infoBox = document.getElementById('info-box');
                 ]
             }
         });
+        // AJOUTER une couche SYMBOL pour afficher les étiquettes d'ethnies
+        map.addLayer({
+            'id': 'ethnies-labels',
+            'type': 'symbol',
+            'source': 'ethnies',
+            'layout': {
+             // Le champ de texte à afficher (propriété du GeoJSON)
+             'text-field': ['get', 'Ethnic_g'], 
+             // Taille du texte
+             'text-size': 10,
+             // Positionnement (si vous utilisez des polygones)
+             'text-anchor': 'center',
+             // Empêche les étiquettes de se chevaucher
+             'text-allow-overlap': false
+             },
+            'paint': {
+            // Couleur du texte
+            'text-color': '#000000', 
+            // Ajout d'une lueur (halo) pour rendre le texte lisible sur n'importe quel fond
+            'text-halo-color': '#FFFFFF', 
+            'text-halo-width': 1.5,
+            'text-opacity': 0.8
+            }
+        });
         map.addSource('aof', {
             'type': 'geojson',
             'data':
@@ -103,7 +127,11 @@ const infoBox = document.getElementById('info-box');
             filter: ['has', 'point_count'],
             layout: {
                 'text-field': '{point_count}',
-                'text-size': 12
+                'text-size': 12,
+                'text-font':['Arial Unicode MS Bold', 'Open Sans Bold']
+            },
+            paint:{
+                'text-color': '#ffffff'
             }
         });
         map.addLayer({
@@ -129,9 +157,9 @@ const infoBox = document.getElementById('info-box');
                 });
             });
         });
-        map.on('click', 'unclustered-point', (e) => {
+        map.on('click', 'unclustered-point', async (e) => {
             const feature = e.features[0];
-            p = feature.properties;
+            const p = feature.properties;
             const html = `
                 <h3 style="margin:0;padding-bottom:4px;">${p.Cercles}</h3>
                 <p>Population avant-guerre : ${p["pop_1911/1914"]} habitants</p>
@@ -143,10 +171,115 @@ const infoBox = document.getElementById('info-box');
                     .setLngLat(feature.geometry.coordinates)
                     .setHTML(html)
                     .addTo(map);
+                createOrUpdateChart ( p, p.Cercles)
         });
         map.on('mouseenter', 'clusters', () => map.getCanvas().style.cursor = 'pointer');
         map.on('mouseleave', 'clusters', () => map.getCanvas().style.cursor = '');
         map.on('mouseenter', 'unclustered-point', () => map.getCanvas().style.cursor = 'pointer');
         map.on('mouseleave', 'unclustered-point', () => map.getCanvas().style.cursor = '');
 
+});
+// ... (votre code MapLibre GL jusqu'à la fin de map.on('load', ...))
+
+// Variable pour stocker les données une fois chargées (plus nécessaire si tout est dans GeoJSON, mais on la garde au cas où)
+let recruitmentData = null; 
+
+// La fonction getRecruitmentData peut être conservée si vous en avez besoin ailleurs, 
+// mais elle n'est plus utilisée par l'événement de clic si les données sont dans le GeoJSON.
+async function getRecruitmentData() {
+    if (recruitmentData) {
+        return recruitmentData;
+    }
+    try {
+        const response = await fetch('./assets/data_recrutement.json'); // Assurez-vous que ce chemin est correct
+        recruitmentData = await response.json();
+        return recruitmentData;
+    } catch (error) {
+        console.error("Erreur lors du chargement des données de recrutement :", error);
+        return [];
+    }
+}
+
+let chart;
+
+/**
+ * Crée ou met à jour le graphique en secteurs (Pie Chart) avec les données d'une entité.
+ * @param {object} properties - Les propriétés de l'entité GeoJSON sélectionnée.
+ * @param {string} name - Le nom de l'entité (par exemple, le cercle de recrutement).
+ */
+// 🎯 CORRECTION 1 : Uniformisation du nom de la fonction à 'createOrUpdateChart'
+function createOrUpdateChart(properties, name) { 
+    const ctx = document.getElementById('pieChart');
+
+    if (chart) { 
+       chart.destroy(); // DÉTUIT l'ancien graphique (Très bien !)
+    }
+
+    // 🎯 CORRECTION 2 : Utilisation correcte du paramètre 'properties' 
+    // (qui remplace 'region' et contient les données)
+    // On utilise Number() pour s'assurer que les valeurs sont des nombres pour Chart.js.
+    const r1914 = Number(properties["r1914"]);
+    const r1916 = Number(properties["r1916"]);
+    const r1917 = Number(properties["r1917"]);
+    const r1918 = Number(properties["r1918"]); // Assumant r1818 était une faute de frappe
+
+    // Vérifier si les données sont valides
+    if (isNaN(r1914) || isNaN(r1916) || isNaN(r1917) || isNaN(r1918)) { 
+        console.warn(`Données de recrutement incomplètes ou manquantes pour : ${name}`);
+        // Effacer le canvas
+        ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+        return;
+    }
+
+    // Création du graphique Chart.js
+    chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Recrutement 1914', 'Recrutement 1916', 'Recrutement 1917', 'Recrutement 1918'],
+            datasets: [{
+                label: `Recrutement par année - ${name}`,
+                data: [r1914, r1916, r1917, r1918], // Utilisation des données converties
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)', 
+                    'rgba(54, 162, 235, 0.6)', 
+                    'rgba(255, 206, 86, 0.6)', 
+                    'rgba(75, 192, 192, 0.6)'  
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+       options: {
+            responsive: true,
+            maintainAspectRatio: false, 
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Recrutement par année pour : ${name}`
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const value = context.parsed;
+                                const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                label += `${value} (${percentage})`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
     });
+}
