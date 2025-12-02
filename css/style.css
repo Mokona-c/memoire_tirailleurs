@@ -5,20 +5,21 @@ body {
     background-repeat: no-repeat;
     background-size: 100% auto;
     background-position: top left ;
-    margin: 0;
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .papier {
     background: #E8E0D7;
     width: 95%;
     max-width: 1400px;
-    padding: 20px;
+    padding: 1px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
+    border-radius: 0px;
     display: flex;
     flex-direction: column;
-    margin: 20px auto;
+    margin: 0px auto;
 }
 
 .imgpied {
@@ -58,11 +59,16 @@ body {
     padding: 10px;
     border-radius: 5px;
     text-align: center;
+    min-width: 250px;
+    height: 100%;
+    overflow-y: auto;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
 }
 
 /*Format de textes */
@@ -72,7 +78,7 @@ h1 {
     text-decoration: underline;
     text-align: center;
     text-justify: auto;
-    color :#000000
+    color: #4F5D75;
 }
 
 h2 {
@@ -116,9 +122,11 @@ p {
 
 /*Création de la Carte*/
 #mapid {
+    position: relative;
+    width: 100%;
+    height: 100%;
     flex-grow: 1;
     min-height: 450px;
-    width: 100%;
     border-radius: 5px;
 }
 
@@ -139,3 +147,33 @@ p {
     margin-right: 8px;
     opacity: 0.7;
 }
+
+/* Style pour les graphs */
+.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 0px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+#main-container {
+    display: flex;
+    height: 100%; /* Prend toute la hauteur du body */
+    width: 100%;
+}
+
+
+/* Le canvas pour Chart.js */
+#pieChart {
+    /* Laisse Chart.js gérer la taille à l'intérieur de son conteneur (column-2) */
+    /* Ces règles forcent le canvas à remplir l'espace si Chart.js est réactif */
+    width: 100% !important; 
+    height: 300px; /* DONNEZ UNE HAUTEUR FIXE ou MAXIMALE AU CANVAS via CSS */
+    max-height: 50vh; /* Ou utilisez vh pour une hauteur proportionnelle à la fenêtre */
+}
+
