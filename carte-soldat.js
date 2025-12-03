@@ -9,7 +9,7 @@ const map = new maplibregl.Map({
         'naissance': { center: [-15.97, 12.82], zoom: 10 },
         'france': { center: [1.43, 44.43], zoom: 10 },
         'combats': { center: [2.52, 49.87], zoom: 10 },
-        'stalag': { center: [13.4, 52.62], zoom: 10 },
+        'stalag': { center: [9.1, 53.38], zoom: 10 },
         'transfert': { center: [-0.98, 43.73], zoom: 10 },
         'evasion': { center: [-17.45, 14.72], zoom: 10 },
         'debarquement': { center: [5.92, 43.12], zoom: 10 },
