@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Visualisation Web-SIG Tirailleurs Sénégalais</title>
+    <meta property="og:description" content="Visualisation interactive des lieux de décès et de naissance des Tirailleurs Sénégalais." />
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.js'></script>
+    <style>
+        /* Styles pour le corps et la carte */
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        html, body, #map { height: 100%; }
+
+        /* Styles de la Sidebar (Division B : Carte de l'Afrique) */
+            .rounded-rect { background:black; border-radius: 10px; box-shadow: 0 0 50px -25px black; }
+            .flex-center { position: absolute; display: flex; justify-content: center; align-items: center; }
+            .flex-center.right { right: 0px; }
+            .sidebar-content { position: absolute; width: 95%; height: 95%; overflow: hidden; display: flex; flex-direction: column; }
+        
+                /* Styles d'affichage des statique de la carte d'Afrique */
+                #afrique-message { color: white; padding: 15px; text-align: left; font-size: 1.5em; overflow-y: auto; max-height: 20%;}
+                #afrique-message ul {list-style-type: none; padding-left: 0;}
+                #afrique-message li {margin-bottom: 5px; padding: 3px 5px; border-radius: 3px;}
+
+                /* Conteneur de la carte Afrique */
+                #map-afrique-container { width: 100%; height: 80%;}
+                #map-afrique {width: 100%; height: 100%;}
+            
+                /* Styles du bouton de la sidebar */
+                .sidebar-toggle { position: absolute; width: 3em; height: 3em; overflow: visible; display: flex; justify-content: center; align-items: center; color : white; background: black; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); z-index: 15; font-size: 2em; font-weight: bold }
+                .sidebar-toggle.right { left: -0.7em; }
+                .sidebar-toggle:hover { color: #0aa1cf; cursor: pointer; background-color: #333 }
+                .sidebar { transition: transform 1s; z-index: 10; width: 600px; height: 100%; }
+                .right.collapsed {transform: translateX(595px); }
+
+        /* --- Styles de la Division C (Contrôles Temporels) --- */
+            #controle_temporel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60%; 
+            height: 25%; 
+            background-color: black;
+            z-index: 5;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex; 
+            flex-direction: column;
+            justify-content: space-around;
+            }
+            .echelle-container { display: flex; align-items: center; gap: 50px; }
+            .bouton-defilement {  align-items: center; appearance: none; background-color: #fff; border-radius: 12px; border-style: none; 
+                box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+                box-sizing: border-box;
+                color: #3c4043;
+                cursor: pointer;
+                display: inline-flex;
+                fill: currentcolor;
+                font-family: "Google Sans",Roboto,Arial,sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                height: 48px;
+                justify-content: center;
+                letter-spacing: .25px;
+                line-height: normal;
+                max-width: 100%;
+                overflow: visible;
+                padding: 2px 24px;
+                position: relative;
+                text-align: center;
+                text-transform: none;
+                transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: manipulation;
+                width: auto;
+                will-change: transform,opacity;
+                z-index: 0;}
+            .bouton-defilement:hover{background: #F6F9FE; color: #174ea6;}
+            .bouton-defilement:active{box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);outline: none;}    
+            .button-17:focus {outline: none; border: 2px solid #4285f4;}
+            .bouton-defilement:not(:disabled) {box-shadow: rgba(226, 229, 232, 0.986) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;}
+            .bouton-defilement:not(:disabled):hover {box-shadow: rgba(201, 204, 206, 0.765) 0 2px 3px 0, rgba(210, 213, 215, 0.783) 0 2px 10px 4px;}
+            .bouton-defilement:not(:disabled):focus {box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;}
+            .bouton-defilement:not(:disabled):active {box-shadow: rgba(201, 204, 206, 0.765) 0 2px 3px 0, rgba(210, 213, 215, 0.783) 0 2px 10px 4px;}
+            .bouton-defilement:disabled {box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;}
+            .timeline {display: flex; align-items: center; position: relative; flex-grow: 1; justify-content: space-around;}
+            .timeline-item { 
+                width: 25px; 
+                height: 25px; 
+                border-radius: 50%; 
+                background-color: #CCCCCC;
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                font-size: 10px; 
+                color: white; 
+                cursor: pointer; 
+                position: relative; 
+                transition: background-color 0.3s, transform 0.3s; 
+            }
+            .timeline-item.active {transform: scale(1.2); box-shadow: 0 0 5px #0aa1cf;}
+            .timeline-label { position: absolute; bottom: -20px; font-size: 13px; white-space: nowrap;height: 3px; }
+            .timeline-count {position: absolute; top: -25px; font-size: 18px; font-weight: bold; color: #de0e0e; white-space: nowrap; display: none; /* Caché par défaut */}
+
+    </style>
+</head>
+<body>
+
+    <div id="map">
+        <div id="right" class="sidebar flex-center right collapsed">
+            <div class="sidebar-content rounded-rect flex-center">
+                <div id="afrique-message"></div>
+                <div id="map-afrique-container">
+                    <div id="map-afrique"></div>
+                </div>
+
+                <div
+                    class="sidebar-toggle rounded-rect right"
+                    onclick="toggleSidebar('right')"
+                >
+                    &larr;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="controle_temporel">
+        <div class="echelle-container">
+            <button id="prev-annee" class="bouton-defilement" onclick="defilerTemps('annee', -1)">Previous</button>
+            <div id="timeline-annee" class="timeline"> </div>
+            <button id="next-annee" class="bouton-defilement" onclick="defilerTemps('annee', 1)">Next</button>
+        </div>
+
+        <div class="echelle-container">
+            <button id="prev-mois" class="bouton-defilement" onclick="defilerTemps('mois', -1)">Previous</button>
+            <div id="timeline-mois" class="timeline"> </div>
+            <button id="next-mois" class="bouton-defilement" onclick="defilerTemps('mois', 1)">Next</button>
+        </div>
+    </div>
+
+    <script>
+
+        // URL données
+        const POINTS_DECES_URL = 'https://raw.githubusercontent.com/angeevrard/webmapping_tirailleurs_senegalais/main/points_deces_wgs84.geojson'; 
+        const AFRIQUE_GEOJSON_URL = 'https://raw.githubusercontent.com/angeevrard/webmapping_tirailleurs_senegalais/main/afrique.geojson'; 
+
+        // Valeurs spéciales : pour les catégories année, mois, pays
+            const ANNEE_INCONNUE_VALEUR = 9999;
+            const MOIS_INCONNU_VALEUR = 0;
+            const PAYS_INCONNU_VALEUR = 'Inconnu';
+    
+        // Liste des années
+            const ANNEES_CONNUES = [1939, 1940, 1941, 1942, 1943, 1944, 1945, 1946, 1952];
+            const ANNEES = [...ANNEES_CONNUES, ANNEE_INCONNUE_VALEUR]; 
+
+        // Liste des mois    
+            const MOIS_LABELS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc", "Inconnu"];
+            const MOIS = Array.from({length: 12}, (_, i) => i + 1); 
+            MOIS.push(MOIS_INCONNU_VALEUR); 
+
+        // Statistiques des décès
+            const STATS_DECES = {
+                annee: {
+                    '1939':52, '1940': 2608, '1941': 598, '1942': 275, '1943': 216, 
+                    '1944': 635, '1945': 206, '1946': 56, '1952': 1, 
+                    '9999': 90  
+                },
+                mois: {
+                    '1': 124, '2': 149, '3': 154, '4': 189, '5': 987, '6': 1765, 
+                    '7': 212, '8': 347, '9': 231, '10': 181, '11': 163, '12': 101, 
+                    '0': 134 
+                },
+                
+            };  
+    
+        // Mappage des couleurs pour la Timeline (Division C) 
+            const COULEURS_ANNEES = {
+                '1939': '#FF1744',
+                '1940': '#1E88E5', 
+                '1941': '#00E676',
+                '1942':'#D500F9',
+                '1943':'#FFEB3B',
+                '1944':'#00B0FF',
+                '1945':'#7C4DFF',
+                '1946':'#FF4D4D',
+                '1952': '#4DD0E1',
+                '9999': '#FF6D00' 
+            };
+
+            const COULEURS_MOIS = {
+                '1': '#FF1744', 
+                '2': '#1E88E5', 
+                '3': '#00E676', 
+                '4': '#D500F9', 
+                '5': '#FFEB3B', 
+                '6': '#00B0FF',
+                '7': '#7C4DFF', 
+                '8': '#FF4D4D', 
+                '9': '#4DD0E1', 
+                '10': '#FF6D00', 
+                '11': '#FF2D95', 
+                '12': '#66FF33',
+                '0': '#2A2A2A' 
+            };    
+    
+        // NOUVEAU: Variable pour stocker toutes les features (points) une fois chargées
+            let allPointsFeatures = []; 
+            
+            let currentIndexAnnee = -1; 
+            let currentIndexMois = -1;   
+
+        // Carte France (Division A) 
+            const map = new maplibregl.Map({
+                container: 'map',
+                style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json', 
+                center: [11.506929,45.050027], 
+                zoom: 4.9,
+                padding: { bottom: window.innerHeight * 0.1 } 
+            });
+
+        // Carte Afrique (Division B) 
+            const mapAfrique = new maplibregl.Map({
+                container: 'map-afrique',
+                style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+                center: [16.614042, 0.5], 
+                zoom: 2.5,
+                attributionControl: false 
+            });
+
+        // Gestion des Données et des Couches (map.on('load')) 
+            map.on('load', async () => {
+                
+                // Ajout de la source des points de décès (clustérisation activée)
+                    map.addSource('deces-points', {
+                        type: 'geojson',
+                        data: POINTS_DECES_URL,
+                        cluster: true, 
+                        clusterMaxZoom: 30, 
+                        clusterRadius: 50
+                    });
+
+                // Charger toutes les features dans allPointsFeatures
+                    const response = await fetch(POINTS_DECES_URL);
+                    const geojson = await response.json();
+                    allPointsFeatures = geojson.features;
+
+                // Couches d'affichage des points (clusters et points simple)
+                    map.addLayer({ /* clusters */ id: 'clusters', type: 'circle', source: 'deces-points', filter: ['has', 'point_count'], paint: {
+                        'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 100, '#f1f075', 750, '#f28cb1'],
+                        'circle-radius': ['step', ['get', 'point_count'], 20, 100, 30, 750, 40]
+                    }});
+
+                    map.addLayer({ /* clusters-count */ id: 'cluster-count', type: 'symbol', source: 'deces-points', filter: ['has', 'point_count'], layout: {
+                        'text-field': '{point_count_abbreviated}',
+                        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                        'text-size': 12
+                    }, paint: { 'text-color': '#000' }});
+        
+                    map.addLayer({ /* points simple*/ id: 'unclustered-point', type: 'circle', source: 'deces-points', filter: ['!', ['has', 'point_count']], paint: {
+                        'circle-color': ['get', 'display_color'], 
+                        'circle-radius': 10,
+                        'circle-stroke-width': 1,
+                        'circle-stroke-color': '#fff'
+                    }});
+
+                // Initialisation des timelines
+                    initialiserTimeline('annee', ANNEES, 
+                        ANNEE => ANNEE === ANNEE_INCONNUE_VALEUR ? 'Inconnu' : ANNEE.toString(), 
+                        valeur => STATS_DECES.annee[valeur.toString()]
+                    );
+                    initialiserTimeline('mois', MOIS, 
+                        MOIS_VALEUR => MOIS_LABELS[MOIS_VALEUR === 0 ? 12 : MOIS_VALEUR - 1], 
+                        valeur => STATS_DECES.mois[valeur.toString()]
+                    );
+                
+                    appliquerFiltreTemps();
+
+                // Gestion de l'intéraction (l'orsqu'on clique clic sur un point)
+                    map.on('click', 'unclustered-point', (e) => {
+                        
+                        const featureClicked = e.features[0];
+                        const communeClickee = featureClicked.properties.commune_correcte; 
+                        
+                        // Filtrage et agrégation en mémoire 
+                        const statsParPays = allPointsFeatures
+                            .filter(f => f.properties && f.properties.commune_correcte === communeClickee) // Filtrer par commune
+                            .reduce((acc, feature) => { // Agréger par pays_naissance
+                                const pays = feature.properties.pays_naissance || PAYS_INCONNU_VALEUR;
+                                if (!acc[pays]) { acc[pays] = 0; }
+                                acc[pays]++;
+                                return acc;
+                            }, {});
+                        
+                        // Calculer le total des décès pour le popup
+                        const totalDecesCommune = Object.values(statsParPays).reduce((sum, count) => sum + count, 0);
+
+                        // Affichage du Popup
+                        new maplibregl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(`
+                                <h2>${communeClickee}</h2>
+                                <p>Nombre de décès: <b>${totalDecesCommune}</b></p>
+                            `)
+                            .addTo(map);
+
+                        // Affichage et mise à jour de la Sidebar Afrique (Division B)
+                        toggleSidebar('right', true); 
+                        
+                        // Passage des statistiques agrégées à la fonction d'affichage
+                        updateAfriqueStatsSidebar(statsParPays); 
+                    });
+                
+                    // Intéraction lorsqu'on clique sur les clusters
+                        map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+                        map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
+                        
+                        map.on('click', 'clusters', async(e) => {
+                            const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+                            const clusterId = features[0].properties.cluster_id;
+                            if (!clusterId) return;
+                            const zoom = await map.getSource('deces-points').getClusterExpansionZoom(clusterId);
+                            map.easeTo({ center: features[0].geometry.coordinates, zoom : zoom + 0.5,});
+                            });
+
+                        map.on('mouseenter', 'clusters', () => {
+                            map.getCanvas().style.cursor = 'pointer';
+                        });
+                        map.on('mouseleave', 'clusters', () => {
+                            map.getCanvas().style.cursor = '';
+                        });    
+            });
+
+        // Popup pour les pays africain
+            const popupAfrique = new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false
+            });
+    
+        // Gestion des Données et des Couches de la Division B : Afrique
+            mapAfrique.on('load', () => {
+                mapAfrique.addSource('afrique-source', { type: 'geojson', data: AFRIQUE_GEOJSON_URL });
+        
+                mapAfrique.addLayer({
+                    id: 'afrique-fill',
+                    type: 'fill',
+                    source: 'afrique-source',
+                    paint: {
+                        'fill-color': ['case', ['==', ['get', 'NOM_PAYS'], ''], '#ccc', '#ff0000'],
+                        'fill-opacity': 0.7,
+                        'fill-outline-color': '#000'
+                    },
+                    filter: ['==', 'NOM_PAYS', ''] 
+                });
+
+                mapAfrique.addLayer({
+                    id: 'afrique-count',
+                    type: 'symbol',
+                    source: 'afrique-source',
+                    layout: {
+                        'text-field': '', 
+                        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                        'text-size': 14
+                    },
+                    paint: { 'text-color': '#000' }
+                    });
+
+                // Survol : afficher nom du pays
+                mapAfrique.on('mousemove', 'afrique-fill', function (e) {
+
+                    if (!e.features || e.features.length === 0) return;
+
+                    const pays = e.features[0].properties.NOM_PAYS;
+
+                    popupAfrique
+                        .setLngLat(e.lngLat)
+                        .setHTML(`<strong style="color:black">${pays}</strong>`)
+                        .addTo(mapAfrique);
+                });
+
+                // Quand la souris sort du pays enleve le popup
+                mapAfrique.on('mouseleave', 'afrique-fill', function () {
+                    popupAfrique.remove();
+                });
+                mapAfrique.on('mouseenter', 'afrique-fill', () => {
+                            mapAfrique.getCanvas().style.cursor = 'pointer';
+                        });
+
+
+            });
+
+        // Mise à jour de la Sidebar B avec les statistiques de la commune cliquée 
+            function updateAfriqueStatsSidebar(statsParPays) {
+        
+                const afriqueMessage = document.getElementById('afrique-message');
+                const mapAfriqueDiv = document.getElementById('map-afrique-container');
+
+                // mettre des couleurs dans les pays correspondants aux lieux de naissances des soldats de la commune cliquée
+                const paysPresent = Object.keys(statsParPays).filter(pays => pays !== PAYS_INCONNU_VALEUR);
+
+                if (paysPresent.length === 0) {
+                    mapAfriqueDiv.style.display = 'block';
+                    afriqueMessage.style.display = 'block';
+                    afriqueMessage.innerHTML = '<h2 style="color:white; margin-top: -6px;">Pays d\'origine non visualisable</h2><p style="color:white;">Le(s) soldat(s) morts ici ont un pays de naissance inconnu.</p>';
+                    if (mapAfrique.getSource('afrique-source')) {
+                        mapAfrique.setFilter('afrique-fill', ['==', 'NOM_PAYS', '']);
+                    }
+                    return;
+                }
+
+                // Afficher la carte
+                mapAfriqueDiv.style.display = 'block';
+        
+                // Filtre les polygones de l'Afrique pour colorier les pays concernés
+                mapAfrique.setFilter('afrique-fill',['in', ['get', 'NOM_PAYS'], ['literal', paysPresent]]);
+                mapAfrique.setFilter('afrique-count',['in', ['get', 'NOM_PAYS'], ['literal', paysPresent]]);
+                
+                // Construire la liste des statistiques pour l'affichage textuel (décompte par pays)
+                let statsHTML = `<h3 style="color:white; margin-top: 5px;">Décès par Pays de naissance dans cette commune :</h3><ul style="padding-left: 0;">`;
+        
+                // Trier par nombre de décès décroissant
+                const paysSorted = Object.entries(statsParPays)
+                    .sort(([, countA], [, countB]) => countB - countA);
+
+                paysSorted.forEach(([pays, count]) => {
+                    const isAfrica = paysPresent.includes(pays);
+                    // La couleur de fond de la liste indique si le pays est coloré sur la carte Afrique
+                    statsHTML += `<li style="margin-bottom: 5px; color:white; background-color: ${isAfrica ? 'rgba(255, 0, 0, 0.3)' : 'rgba(100, 100, 100, 0.3)'}; padding: 3px 5px; border-radius: 3px;">
+                                    <strong>${pays}:</strong> ${count} soldat(s)
+                                </li>`;
+                });
+                statsHTML += `</ul>`;
+        
+                afriqueMessage.innerHTML = statsHTML;
+            }    
+
+        // Fonction pour basculer la sidebar (Division B)
+            function toggleSidebar(id, forceOpen = false) {
+                const elem = document.getElementById(id);
+                const classes = elem.className.split(' ');
+                const collapsed = classes.indexOf('collapsed') !== -1;
+
+                // Si on veut forcer l'ouverture de la sidebar et qu'elle est déjà ouverte, on sort.
+                if (forceOpen && !collapsed) return;
+    
+                const padding = {};
+
+                if (collapsed || forceOpen) {
+                    // Enleve la classe qui cache la sidebar : elle s'ouvre
+                    if (collapsed) classes.splice(classes.indexOf('collapsed'), 1);
+                    padding[id] = 600; 
+                } else {
+                    // Ajoute la classe pour cacher la sidebar : elle se ferme
+                    classes.push('collapsed');
+                    padding[id] = 0;
+                }
+
+                elem.className = classes.join(' ');
+    
+                // Animation de la carte principale (1000ms)
+                map.easeTo({
+                    padding,
+                    duration: 1000 
+                });
+
+                if (collapsed || forceOpen) {
+                    setTimeout(() => {
+                        mapAfrique.resize();
+                        console.log('✅ mapAfrique.resize() exécuté pour afficher la carte Afrique.');
+                    }, 1100); 
+                }
+            }    
+        
+        // Fonctions de la Timeline (Division C) -
+            function initialiserTimeline(type, valeurs, getLabel, getCount) {
+                const timeline = document.getElementById(`timeline-${type}`);
+                timeline.innerHTML = ''; 
+
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.id = `progress-${type}`;
+                timeline.appendChild(progressBar);
+        
+                // Détermine la source de couleurs
+                const couleurSource = (type === 'annee') ? COULEURS_ANNEES : COULEURS_MOIS;
+        
+                valeurs.forEach((valeur, index) => {
+                    let circle = document.createElement('div');
+                    circle.className = 'timeline-item';
+                    
+                    const idValeur = valeur.toString();
+                    circle.id = `${type}-${idValeur}`;
+                    
+                    const couleurDuCercle = couleurSource[idValeur] || '#CCCCCC';
+                    
+                    // Stocker la couleur cible dans un attribut data-color
+                    circle.setAttribute('data-color', couleurDuCercle); 
+
+                    // Ajout du Label (Année/Mois/Inconnu)
+                    let label = document.createElement('span');
+                    label.className = 'timeline-label';
+                    label.textContent = getLabel(valeur); 
+                    label.style.color = 'white'; 
+                    circle.appendChild(label);
+
+                    // Ajout du Compteur
+                    let count = document.createElement('span');
+                    count.className = 'timeline-count';
+                    count.textContent = getCount(valeur).toLocaleString('fr-FR');
+                    circle.appendChild(count);
+
+                    circle.onclick = () => { selectTime(type, index); };
+                    timeline.appendChild(circle);
+                });
+            }
+
+            function selectTime(type, index) {
+                let valeurs;
+                if (type === 'annee') {
+                    valeurs = ANNEES;
+                } else {
+                    valeurs = MOIS;
+                }
+    
+                const timeline = document.getElementById(`timeline-${type}`);
+
+                // Récupérer l'élément actif AVANT le masquage
+                const prevElement = timeline.querySelector('.timeline-item.active');
+    
+                // Masquer tous les compteurs
+                timeline.querySelectorAll('.timeline-count').forEach(span => {
+                    span.style.display = 'none';
+                });
+
+                if (prevElement) {
+                    prevElement.classList.remove('active');
+
+                    prevElement.style.backgroundColor = '#CCCCCC'; // Couleur grise
+                }
+    
+                // Mettre à jour l'index
+                if (type === 'annee') {
+                    currentIndexAnnee = index;
+                } else {
+                    currentIndexMois = index;
+                }
+    
+                // RETARDER L'AFFICHAGE DU CERCLE ET DU COMPTEUR
+                setTimeout(() => {
+                    
+                    const idValeur = valeurs[index].toString();
+                    const selectedItem = document.getElementById(`${type}-${idValeur}`);
+                    
+
+                    if (selectedItem) {
+                        // Appliquer la couleur stockée
+                        const couleurActive = selectedItem.getAttribute('data-color');
+                        selectedItem.style.backgroundColor = couleurActive;
+                        
+                        // Activation du cercle visuel
+                        selectedItem.classList.add('active');
+                        
+                        // Affichage du compteur
+                        const countSpan = selectedItem.querySelector('.timeline-count');
+                        if (countSpan) {
+                            countSpan.style.display = 'block';
+                        }
+                    }
+        
+                }, 0.2);
+
+                appliquerFiltreTemps();
+
+            }
+
+            function defilerTemps(type, direction) {
+                let currentIndex, maxIndex, valeurs;
+                if (type === 'annee') {
+                    currentIndex = currentIndexAnnee;
+                    valeurs = ANNEES;
+                } else {
+                    currentIndex = currentIndexMois;
+                    valeurs = MOIS;
+                }
+                maxIndex = valeurs.length - 1; 
+
+                let newIndex = currentIndex + direction;
+
+                // LOGIQUE DE DOUBLE-CLIC 
+    
+                    // CAS 1: Gérer l'état initial inactif (-1)
+                    if (currentIndex === -1) {
+                        // Au premier clic (Next ou Previous), on commence toujours par l'index 0.
+                        newIndex = 0; 
+                    }
+    
+                    // CAS 2: Boucle NEXT (Aller du dernier élément au début)
+                    else if (newIndex > maxIndex) {
+                        // Si on a dépassé le dernier élément (Inconnu), on entre dans l'état de pause.
+                        newIndex = -1; 
+                    } 
+    
+                    // CAS 3: Boucle PREVIOUS (Aller du premier élément à la fin)
+                    else if (newIndex < 0) {
+                        // Si on est allé avant le premier élément, on entre dans l'état de pause.
+                        newIndex = -1;
+                    }
+    
+
+                selectTime(type, newIndex);
+
+                defilerTemps()
+            }    
+  
+            function appliquerFiltreTemps() {
+                if (!map.getSource || !map.getSource('deces-points')) return;
+
+                // Détermination de l'état actif basé sur les index globaux
+                    const anneeActive = currentIndexAnnee !== -1;
+                    const moisActive = currentIndexMois !== -1;
+                    const filtreTemporalActif = anneeActive || moisActive;
+
+                    let annee = anneeActive ? ANNEES[currentIndexAnnee] : null;
+                    let mois = moisActive ? MOIS[currentIndexMois] : null;
+
+                // Déterminer la couleur active pour les POINTS INDIVIDUELS
+                    let couleurActive = null;
+                    if (mois !== null) {
+                        couleurActive = COULEURS_MOIS[mois.toString()] || null;
+                    } else if (annee !== null) {
+                        couleurActive = COULEURS_ANNEES[annee.toString()] || null;
+                    }
+
+                // Définir la couleur du CLUSTER en premier 
+                    // Si un filtre est actif, utilisez la couleur du filtre
+                    if (filtreTemporalActif) { 
+                        
+                        map.setPaintProperty('clusters', 'circle-color', couleurActive);
+                        map.setPaintProperty('cluster-count', 'text-color', '#000'); 
+                    } else {
+                        // Si inactif (currentIndex = -1), remet le style d'origine
+                        map.setPaintProperty('clusters', 'circle-color', [
+                            'step',
+                            ['get', 'point_count'],
+                            '#51bbd6', 100, '#f1f075', 750, '#f28cb1' 
+                        ]);
+                        map.setPaintProperty('cluster-count', 'text-color', '#000'); 
+                    }
+
+
+
+                // FILTRAGE DES DONNÉES 
+                    // Cette partie est exécutée même si filtreTemporalActif est false, pour montrer TOUTES les données.
+    
+                        const filtered = {
+                            type: "FeatureCollection",
+                            features: allPointsFeatures
+                                .filter(f => {
+                                    // Si filtreTemporalActif est FAUX (currentIndexAnnee = -1),
+                                    // les conditions `annee !== null` et `mois !== null` sont FAUSSES,
+                                    // donc la fonction filter retourne TOUJOURS true. (Ce qui est l'effet désiré)
+                                    const a = parseInt(f.properties.annee_deces);
+                                    const m = parseInt(f.properties.mois_deces);
+
+                                    if (annee !== null && a !== annee) return false;
+                                    if (mois !== null && m !== mois) return false;
+                                    return true;
+                                })
+                                .map(f => {
+                                    const ff = JSON.parse(JSON.stringify(f));
+                    
+                                    // Si un filtre est actif, on utilise la couleur du filtre.
+                                        if (couleurActive) {
+                                            ff.properties.display_color = couleurActive;
+                                        } else {
+                                            // Si TOUT est affiché, on utilise la couleur_annee stockée dans le GeoJSON
+                                            ff.properties.display_color = ff.properties.couleur_annee || '#CCCCCC';
+                                        }
+                                        return ff;
+                                })
+                        };
+
+                    // Mettre à jour la source (reconstruit les clusters pour ce sous-ensemble)
+                        map.getSource('deces-points').setData(filtered);
+
+
+                    // S'assurer que la couche 'unclustered-point' utilise bien display_color
+                        if (map.getLayer('unclustered-point')) {
+                            map.setPaintProperty('unclustered-point', 'circle-color', ['get', 'display_color']);
+                        }
+
+                    // Mise à jour visuelle de la progress bar / timeline si besoin (retiré car géré par selectTime)
+                        if (currentIndexAnnee !== -1) updateProgressBar('annee', currentIndexAnnee, ANNEES.length);
+                        if (currentIndexMois !== -1) updateProgressBar('mois', currentIndexMois, MOIS.length);
+            }
+
+    
+    </script>
+</body>
+</html>
