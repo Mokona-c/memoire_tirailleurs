@@ -8,7 +8,7 @@
 
     <title>Tirailleur-senegalais</title>
 
-    <link rel='stylesheet' href='css/style.css'>
+    <link rel='stylesheet' href='/css/style.css'>
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css' />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><!--Import Google Icon Font-->
     <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
@@ -21,51 +21,125 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script type='text/javascript' src='page2.js'></script>
 
     <!-- import de materializecss / google icon et materialize JS/ -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type='text/javascript' src='page2.js'></script>
 </head>
 
 <body>
+
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="index.html" class="brand-logo">LOGO</a>
+        </div>
+        <div class="nav-content">
+            <ul class="tabs tabs-transparent scrollable">
+                <li class="tab"><a href="index.html">Page d'acceuil</a></li>
+                <li class="tab"><a class="active" href="page1.html">Les deux guerres</a></li>
+                <li class="tab"><a href="page2.html">les soldats</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="papier">
-        <nav class="nav-extended">
-            <div class="nav-wrapper">
-                <a href="index.html" class="brand-logo">LOGO</a>
-            </div>
-            <div class="nav-content">
-                <ul class="tabs tabs-transparent scrollable">
-                    <li class="tab"><a href="index.html">Page d'acceuil</a></li>
-                    <li class="tab"><a class="active" href="page1.html">1ere guerre mondiale</a></li>
-                    <li class="tab"><a href="page2.html">2eme guerre mondiale</a></li>
-                </ul>
-            </div>
-        </nav>
 
+        <div class="section">
+            <div class="sectionclass" style="max-height: 500px;">
 
+                <div class="column-1" style="flex-basis: 50%;" >
+                    <div id="map" style="position: relative; width: 50%; height: 100%; flex-grow: 1; min-height: 450px;"></div>
+                </div>
+
+                <div class="column-2" style="flex-basis: 50%;overflow: scroll;">
+
+                    <section_soldat id="naissance" class="active">
+                        <h3>1919 : naissance</h3>
+                        <p>Bourama Diémé naît le 1er janvier 1919 à Marsassoum, en Casamance au Sénégal.</p>
+                        <p></p>
+                    </section_soldat>
+                    <section_soldat id="1939">
+                        <h3>5 janvier 1939 : appel au combat</h3>
+                        <p>D'abord appelé au 7ème Régiment de Tirailleurs Sénégalais (RTS), il fût ensuite transféré
+                            au 16ème RTS à Cahors, dans le Lot.</p>
+                    </section_soldat>
+                    <section_soldat id="combats">
+                        <h3>Mai 1940 : les combats de la bataille de France</h3>
+                        <p>D'abord stationné en Alsace-Lorraine lors de la "drôle de guerre", il combattit dans la
+                            Sarre, la Somme puis à Villers-Bretonneux.</p>
+                    </section_soldat>
+                    <section_soldat id="stalag">
+                        <h3>1940 : capture et emprisonnement</h3>
+                        <p>Capturé par les Allemands, il échappe à l'éxécution avant d'être emprisonné près de
+                            Berlin, au Stalag 10B.</p>
+                    </section_soldat>
+                    <section_soldat id="transfert">
+                        <h3>1941 : transfert au camp de Buglose</h3>
+                        <p>Il fût ensuite transféré en zone occupée, au camp de Buglose dans les Landes, où sont
+                            emprisonnés les troupes coloniales françaises.</p>
+                    </section_soldat>
+                    <section_soldat id="evasion">
+                        <h3>1942 : l'évasion</h3>
+                        <p>En mars 1942, il parvient à séchapper du camp de Buglose, et gagne la zone libre. A
+                            partir de là, il gagne Dakar au Sénégal pour rejoindre les rangs de la France Libre. Il
+                            est ensuite reversé au 17ème RT en 1943, avant d'être transféré au 16ème RTS en 1944,
+                            alors déployé au Maroc.</p>
+                    </section_soldat>
+                    <section_soldat id="debarquement">
+                        <h3>1944-1945 : débarquement à Toulon puis campagne de France</h3>
+                        <p>Il participa ensuite au débarquement de Provence en septembre 1944. D'abord débarqué à
+                            Toulon, il participa ensuite à la Libération de la France jusque la fin de la guerre.
+                        </p>
+                    </section_soldat>
+                    <section_soldat id="indochine">
+                        <h3>1949-1951 puis 1953-1955 : guerre d'Indochine</h3>
+                        <p>D'abord promu caporal-chef lors de déploiements en Afrique du Nord après la guerre, il
+                            servit ensuite en Indochine au sein du 29ème Bataillon de Marche de Tirailleurs
+                            Sénégalais. Il s'illustra notamment au cours de la bataille de Vinh-Yen en 1950, où il
+                            est promu sergent.</p>
+                    </section_soldat>
+                    <section_soldat id="suez">
+                        <h3>1956 : expédition de Suez</h3>
+                        <p>A son retour d'Indochine, il fût transféré au 23ème Régiment d'Infanterie Coloniale avant
+                            d'être envoyé en Egypte pour participer à l'expédition de Suez.</p>
+                    </section_soldat>
+                    <section_soldat id="algerie">
+                        <h3>1956-1959 : guerre d'Algérie</h3>
+                        <p>Une fois revenu de Suez, son unité est envoyée en Algérie. Il s'illustra notamment en
+                            1958 dans l'oued Cheurfa, où il détruisit une importante position du F.L.N.
+                            Il est ensuite libéré de ses obligations militaires françaises, avant de rejoindre
+                            l'armée sénégalaise, où il s'illustra notamment au Congo belge. Il quitta ses fonctions
+                            militaires en 1965.</p>
+                    </section_soldat>
+                    <section_soldat id="fin">
+                        <h3>Après l'Armée</h3>
+                        <p>Après sa retraite en 1965, il resta au Sénégal jusqu'en 1989, pour s'installer à
+                            Sarcelles. En 1991, il fût nommé Commandeur de la Légion d'Honneur, puit obtînt la
+                            nationalité française en 1996. Il meurt le 6 juin 1999.</p>
+                        <small id="citation">
+                            Consultez la
+                            <a href="https://www.memoiredeshommes.defense.gouv.fr/fichier/1054/13826647">Fiche
+                                Biographique</a>
+                        </small>
+                    </section_soldat>
+                </div>
+            </div>
+        </div>
         <div class="section">
             <h3> La première guerre :</h3>
             <p>Après avoir établi la portée et l'ampleur de la mobilisation des tirailleurs sénégalais,
-                 venus de multiples horizons, notre étude se concentrera désormais sur l'humain.
-                  Nous allons retracer, pour chaque conflit, le parcours singulier d'un soldat ayant pris part aux combats.<br>
-                  Pour illustrer la Seconde Guerre mondiale, nous mettrons en lumière le destin d'Addi Bâ. Ce célèbre combattant, 
-                  originaire de Guinée française, fut fusillé à Épinal en 1943. 
-                  Son sacrifice pour la France en fait une figure emblématique de la Résistance.</p>
-            <div class="sectionclass">
-                <!-- Colonne gauche (75%) -->
-                <div class="column-1">
-                    <p>c'est une colonne de gauche</p>
-                    <div id="mapid"></div><br>
-                </div>
-                <!-- Colonne droite (25%) -->
-                <div class="column-2">
-                    <p>c'est une colonne de droite</p><br>
-                </div>
-            </div>
-        </div> 
+                venus de multiples horizons, notre étude se concentrera désormais sur l'humain.
+                Nous allons retracer, pour chaque conflit, le parcours singulier d'un soldat ayant pris part aux
+                combats.<br>
+                Pour illustrer la Seconde Guerre mondiale, nous mettrons en lumière le destin d'Addi Bâ. Ce célèbre
+                combattant,
+                originaire de Guinée française, fut fusillé à Épinal en 1943.
+                Son sacrifice pour la France en fait une figure emblématique de la Résistance.</p>
+        </div>
     </div>
-
+    <script type='text/javascript' src='page2.js'></script>
 </body>
