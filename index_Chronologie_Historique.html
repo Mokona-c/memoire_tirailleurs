@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>historique</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #F0ECD1;
+      font-family: "Helvetica Neue", sans-serif;
+    }
+    
+    .info {
+      text-align: center;
+      color: #456990;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .info a {
+      color: #456990;
+      text-decoration: none;
+    }
+
+    /* TIMELINE */
+    .timeline2 {
+      overflow-y: scroll;
+      overflow-x: hidden;
+      height: 550px;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    
+    .timeline2 *, .timeline2 *::before, .timeline2 *::after { 
+      font: normal 16px/1.5 "Helvetica Neue", sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    .timeline2::-webkit-scrollbar {
+      width: 12px;
+      background-color: #F5F5F5;
+    }
+    
+    .timeline2::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+      border-radius: 10px;
+      background-color: #F5F5F5;
+    }
+    
+    .timeline2::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+      background-color: #F0ECD1;
+    }
+    
+    .timeline2 ul {
+      background: #F0ECD1;
+    }
+
+    .timeline2 ul li {
+      list-style-type: none;
+      position: relative;
+      width: 2px;
+      margin: 0 auto;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background: #456990;
+      border-left: 3px double white;
+    }
+    
+    .timeline2 ul li::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 30px;
+      transform: translateX(-55%);
+      -webkit-transform: translateX(-55%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: inherit;
+      border: 2px solid #456990;
+    }
+
+    .timeline2 ul li div {
+      position: relative;
+      bottom: 0;
+      width: 400px;
+      padding: 15px;
+      background: #456990;
+    }
+
+    .timeline2 ul li div::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .timeline2 ul li:nth-child(odd) div {
+      left: 45px;
+    }
+
+    .timeline2 ul li:nth-child(odd) div::before {
+      left: -15px;
+      border-width: 16px 16px 16px 0;
+      border-color: transparent #456990 transparent transparent;
+    }
+
+    .timeline2 ul li:nth-child(even) div {
+      left: -439px;
+    }
+
+    .timeline2 ul li:nth-child(even) div::before {
+      right: -15px;
+      border-width: 16px 0 16px 16px;
+      border-color: transparent transparent transparent #456990;
+    }
+    
+    .timeline2 ul li:nth-child(odd) .time {
+      position: absolute;
+      top: 20px;
+      left: -100px;
+      width: 90px;
+    }
+    
+    .timeline2 ul li:nth-child(even) .time {
+      position: absolute;
+      top: 20px;
+      right: -120px;
+      width: 90px;
+    }
+    
+    .timeline2 time {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .timeline-img {
+      width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .timeline2 ul li div strong {
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .timeline2 ul li .time span {
+      color: #1B3252;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    /* EFFECTS */
+    .timeline2 ul li::after {
+      transition: background .5s ease-in-out;
+      -webkit-transition: background .5s ease-in-out;
+    }
+
+    .timeline2 ul li.in-view::after {
+      background: #456990;
+      border: 2px solid white;
+    }
+
+    .timeline2 ul li div {
+      visibility: hidden;
+      opacity: 0;
+      transition: all .5s ease-in-out;
+      -webkit-transition: all .5s ease-in-out;
+    }
+
+    .timeline2 ul li:nth-child(odd) div {
+      transform: translate3d(200px, 0, 0);
+      -webkit-transform: translate(200px, 0, 0);
+    }
+
+    .timeline2 ul li:nth-child(even) div {
+      transform: translate3d(-200px, 0, 0);
+      -webkit-transform: translate(-200px, 0, 0);
+    }
+
+    .timeline2 ul li.in-view div {
+      transform: none;
+      -webkit-transform: none;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .timeline2 ul li .time {
+      transition: all .5s ease-in-out;
+      -webkit-transition: all .5s ease-in-out;
+      transform: rotate(-90deg);
+      -webkit-transform: rotate(270deg);
+    }
+    
+    .timeline2 ul li.in-view .time {
+      transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+    }
+
+    /* MEDIA QUERIES */
+    @media screen and (max-width: 900px) {
+      .timeline2 ul li div {
+        width: 250px;
+      }
+      .timeline2 ul li:nth-child(even) div {
+        left: -289px;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .timeline2 ul li {
+        margin-left: 20px;
+      }
+      .timeline2 ul li div {
+        width: calc(100vw - 120px);
+      }
+      .timeline2 ul li:nth-child(even) div {
+        left: 45px;
+      }
+      .timeline2 ul li:nth-child(even) div::before {
+        left: -15px;
+        border-width: 16px 16px 16px 0;
+        border-color: transparent #456990 transparent transparent;
+      }
+      
+      .timeline2 ul li:nth-child(odd) .time {
+        position: absolute;
+        top: 60px;
+        left: -23px;
+        width: 90px;
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+      }
+      .timeline2 ul li:nth-child(even) .time {
+        position: absolute;
+        top: 60px;
+        right: -67px;
+        width: 90px;
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+      }
+      .timeline2 ul li.in-view:nth-child(odd) .time {
+        transform: rotate(-90deg);
+        -webkit-transform: rotate(270deg);
+      }
+      .timeline2 ul li.in-view:nth-child(even) .time {
+        transform: rotate(-90deg);
+        -webkit-transform: rotate(270deg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="timeline2">
+    <ul>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=Historical%20illustration%20of%20early%20colonial%20military%20formation%20ceremony%20in%20Senegal%201857%20French%20colonial%20officers%20training%20local%20recruits%20vintage%20sepia%20tones%20military%20parade%20formal%20uniforms%20historical%20document%20style&width=300&height=200&seq=timeline-1857&orientation=landscape" class="timeline-img">
+          <strong>Création des Tirailleurs</strong>
+          Création des premiers régiments de tirailleurs sénégalais par le général Faidherbe.
+        </div>
+        <span class="time">
+          <span>1857</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=Black%20and%20white%20photograph%20of%20colonial%20soldiers%20mobilization%201914%20tirailleurs%20boarding%20ships%20for%20France%20military%20uniforms%20departure%20ceremony%20vintage%20sepia%20documentary%20style%20historical%20moment&width=300&height=200&seq=timeline-1914&orientation=landscape" class="timeline-img">
+          <strong>Première Guerre Mondiale - Mobilisation</strong>
+          Plus de 200 000 tirailleurs sont envoyés sur le front européen dès le début du conflit. Ils combattent dans les Vosges, la Champagne et participent aux batailles les plus meurtrières.
+        </div>
+        <span class="time">
+          <span>1914</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=Dramatic%20black%20and%20white%20photograph%20of%20tirailleur%20soldiers%20in%20Verdun%20battlefield%201916%20trenches%20military%20helmets%20rifles%20muddy%20conditions%20war%20photography%20historical%20documentation%20sepia%20tones&width=300&height=200&seq=timeline-1916&orientation=landscape" class="timeline-img">
+          <strong>Bataille de Verdun</strong>
+          Les tirailleurs participent héroïquement à la défense de Verdun, l'une des batailles les plus sanglantes de l'Histoire. Leur bravoure est reconnue par de nombreuses décorations.
+        </div>
+        <span class="time">
+          <span>1916</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=Historical%20photograph%20of%20tirailleur%20soldiers%20celebrating%20armistice%201918%20military%20uniforms%20victory%20celebration%20flags%20crowd%20black%20and%20white%20vintage%20documentary%20style%20joy%20and%20relief&width=300&height=200&seq=timeline-1918&orientation=landscape" class="timeline-img">
+          <strong>L'Offensive Finale</strong>
+          Les tirailleurs participent aux offensives victorieuses qui mènent à l'Armistice. Leur contribution à la victoire française est inestimable, malgré les pertes considérables.
+        </div>
+        <span class="time">
+          <span>1918</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=World%20War%202%20colonial%20soldiers%20mobilization%201940%20tirailleurs%20in%20modern%20military%20uniforms%20preparation%20for%20battle%20black%20and%20white%20photograph%20vintage%20sepia%20military%20formation&width=300&height=200&seq=timeline-1940&orientation=landscape" class="timeline-img">
+          <strong>Seconde Guerre Mondiale - La Défense</strong>
+          Face à l'invasion allemande, les tirailleurs se battent courageusement. Beaucoup sont faits prisonniers et certains sont victimes de massacres par l'armée allemande.
+        </div>
+        <span class="time">
+          <span>1940</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://readdy.ai/api/search-image?query=Liberation%20of%20France%201944%20tirailleur%20soldiers%20marching%20through%20freed%20French%20towns%20celebrating%20crowds%20military%20uniforms%20black%20and%20white%20documentary%20photography%20victory%20parade&width=300&height=200&seq=timeline-1944&orientation=landscape" class="timeline-img">
+          <strong>La Libération de la France</strong>
+          Les tirailleurs participent au débarquement de Provence et à la libération de Paris. L'Armée d'Afrique, comprenant de nombreux tirailleurs, joue un rôle majeur dans la victoire.
+        </div>
+        <span class="time">
+          <span>1944</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzMRerERCfUOCaHPlJP9CChi_vvOe03iAlRA&s" class="timeline-img">
+          Dissolution des dernières unités de tirailleurs sénégalais
+        </div>
+        <span class="time">
+          <span>1960/64</span>
+        </span>
+      </li>
+      <li>
+        <div>
+          <img src="https://journals.openedition.org/bagf/docannexe/image/6883/img-2.jpg" class="timeline-img">
+          <strong>Reconnaissance et Mémoire</strong>
+          La France reconnait officiellement la contribution des tirailleurs et verse une pension identique aux anciens combattants, quelle que soit leur nationalité. Leur sacrifice n'est pas oublié.
+        </div>
+        <span class="time">
+          <span>2010</span>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var timelines = document.querySelectorAll('.timeline2');
+      
+      function debounce(func, wait, immediate) {
+        var timeout;
+        return function() {
+          var context = this, args = arguments;
+          var later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+          };
+          var callNow = immediate && !timeout;
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+          if (callNow) func.apply(context, args);
+        };
+      }
+      
+      function callbackFunc() {
+        var h, timeline, li, rect, parent_rect, i, items;
+        for (h = 0; h < timelines.length; h++) {
+          timeline = timelines[h];
+          parent_rect = timeline.getBoundingClientRect();
+          items = timeline.querySelectorAll(".timeline2 li");
+          for (i = 0; i < items.length; i++) {
+            li = items[i];
+            rect = li.getBoundingClientRect();
+            
+            if ((rect.bottom <= (parent_rect.top + (rect.height / 2))) || 
+                (rect.top >= (parent_rect.bottom - (rect.height / 2)))) {
+              li.classList.remove("in-view");
+            } else {
+              li.classList.add("in-view");
+            }
+          }
+        }
+      }
+      
+      var updateLayout = debounce(function(e) {
+        callbackFunc();
+      }, 500);
+
+      window.addEventListener("load", callbackFunc);
+      window.addEventListener("resize", updateLayout);
+      window.addEventListener("scroll", callbackFunc);
+      
+      for (var h = 0; h < timelines.length; h++) {
+        var timeline = timelines[h];
+        timeline.addEventListener("scroll", callbackFunc);
+      }
+    })();
+  </script>
+</body>
+</html>
